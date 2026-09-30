@@ -1,0 +1,3 @@
+Generated using the built-in image_gen tool.
+
+Use case: logo-brand. Asset type: native iOS fitness tracker app icon, square 1024x1024. Create a polished minimal strength-training icon: a bold sculptural dumbbell angled slightly upwards, expressing progressive overload. Simple recognizable silhouette and restrained dimensional depth, high contrast, readable at home-screen size. Full-bleed opaque background covering the entire square, centered composition with generous safe margins. No text, letters, watermark, border, mockup, or pre-rounded app tile; iOS supplies the corner mask.

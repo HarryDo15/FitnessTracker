@@ -1,0 +1,15 @@
+.build/
+.swiftpm/
+.DS_Store
+xcuserdata/
+DerivedData/
+*.xcuserstate
+*.xcarchive
+*.ipa
+*.store
+*.store-shm
+*.store-wal
+.env
+.env.*
+FitnessTracker-backup*.json
+FitnessTracker-sets*.csv
