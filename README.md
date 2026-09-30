@@ -2,6 +2,14 @@
 
 Native SwiftUI + SwiftData fitness tracker for iOS 17+. Two local profiles, workout logging, progressive overload, Swift Charts, shared gym visits, and punch-card rewards. No third-party dependencies or cloud account required.
 
+## Understanding the code
+
+- [Architecture and code walkthrough](docs/ARCHITECTURE.md): targets, startup, navigation, model relationships, state ownership, saves, and a set-logging sequence diagram.
+- [Complete feature reference](docs/FEATURES.md): screen entry points, source links, formulas, validation, and edge cases for every implemented feature.
+- [Maintenance and testing](docs/MAINTENANCE.md): reading order, where to change rules, seed/migration behavior, backup compatibility, test coverage, and troubleshooting.
+
+Start with Architecture, then use the feature reference alongside the Swift files. Gym check-ins and workouts are separate records: a workout in History does not automatically appear in All gym visits.
+
 ## Open and run
 
 Prerequisites: a Mac with **full Xcode 27 or later for the included project** (the package uses iOS 17 APIs), its iOS Simulator runtime, and an iOS 17+ Simulator or device. Command Line Tools alone do not include the SwiftData/SwiftUI compiler plugins needed for this app. The Swift package uses Swift 5 language mode and also targets macOS 14+ for tests.
@@ -108,7 +116,7 @@ Workout-flow integration tests cover start/resume, profile isolation, prior-set 
 
 - **Exercises → Add exercise** creates an exercise for the selected profile. You can also choose **Create exercise** while adding exercises to a workout. Open an exercise and tap **Edit** to change its name, equipment, muscle group, units, assistance setting, or load notes.
 - In the editor, **Add photo** opens the native photo picker. Photos appear in exercise details and during set logging. You can replace or remove them. Images are resized to at most 1,200 pixels and saved locally as JPEG data using SwiftData external storage; no broad photo-library permission is needed.
-- Qi receives 13 starting references once, including hip thrusts. Bulgarian split squats use **5 kg per dumbbell × 10**; Smith squats use **2.5 kg per side × 10** and hip thrusts **15 kg per side × 12**, excluding bar/machine weight. Partial reps remain notes (hamstring curl: 8 full + 3 partial; leg extension: 9 full + 1 partial). These values are also imported once as a completed baseline workout dated 26 September 2026, with one supplied set per exercise. They appear in History, charts, and last-session prefills. Partial reps remain notes and do not inflate full-rep totals.
+- Qi receives 13 starting references once, including hip thrusts. Bulgarian split squats use **5 kg per dumbbell × 10**; Smith squats use **2.5 kg per side × 10** and hip thrusts **15 kg per side × 12**, excluding bar/machine weight. These values are imported once as a completed baseline workout dated 26 September 2026, with one supplied set per exercise. They appear in History, charts, and last-session prefills. Known partial reps are stored separately (hamstring curl: 8 full + 3 partial; leg extension: 9 full + 1 partial), with the original notes retained. Partials do not inflate full-rep totals.
 - Qi’s current card imports enough previously earned punches to reach **7/10** once, preserving existing visits and any progress above seven. Unknown visit dates are not fabricated. The next three distinct check-ins complete a seven-punch card; claiming starts a fresh card without repeating the import.
 - Rebuild and run the existing app on your phone to apply these additions. Keep the existing installation and bundle identifier to retain its local data. Generic previews opt out of personal imports.
 
@@ -135,7 +143,7 @@ A one-time load correction updates existing Smith total-plates logs to per-side 
 - **Edit sets:** tap a logged set in Today or History. Adjust weight/reps, then Save changes. Delete set requires confirmation. History charts and progression recompute from corrected sets.
 - **Undo:** Today → Undo last set returns the most recently logged set to a planned state and cancels its rest timer. Log it again with the corrected values. The undo action is available during the current logging flow.
 - **Repeat last workout:** Today → Repeat last workout selects the active profile’s latest completed workout, keeps the available exercises in order, and preloads planned sets using double-progression targets. Archived/deleted exercises are skipped. Existing unfinished sessions are resumed instead of overwritten.
-- **Templates:** Today → Workout templates → + creates a named Leg/Push/Pull or custom routine. Choose exercises, reorder them, and select 1–20 sets per exercise. Edit or swipe-delete routines from the list. During a workout, Save as template copies its exercise order. Templates belong to one profile; starting one uses current progression targets and never marks planned sets complete.
+- **Templates:** Today → Workout templates → + creates a named Leg/Push/Pull or custom routine. Choose exercises, reorder them, and select a common count of 1–20 sets for each exercise. Edit or swipe-delete routines from the list. During a workout, Save as template copies its exercise order. Templates belong to one profile; starting one uses current progression targets and never marks planned sets complete.
 - **Favorites and setup:** Exercises → an exercise → Edit → Favorite / Setup notes. Favorites sort first in the library and Add Exercises; Favorites only and search narrow the library. Seat/cable/bench notes appear in exercise details and while logging.
 - **Rest alerts:** gear → Notify when rest ends prompts for iOS notification permission. Logging restarts the 3-minute alert; +30s reschedules it, and Skip, Undo, Finish, or discarding the workout cancels it. Both profiles’ timers remain independent. Focus or device notification settings can silence delivery. Check actual locked-screen behavior on an iPhone.
 
