@@ -26,11 +26,13 @@ enum WorkoutCalculations {
 struct SetDraft {
     var weight: Double = 0
     var reps: Int = 10
+    var partialReps: Int = 0
 }
 
 struct PreviousSet: Identifiable {
     let id: UUID
     let weight: Double
     let reps: Int
+    var partialReps: Int = 0
     let unit: WeightUnit
 }

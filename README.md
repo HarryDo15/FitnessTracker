@@ -4,7 +4,7 @@ Native SwiftUI + SwiftData fitness tracker for iOS 17+. Two local profiles, work
 
 ## Open and run
 
-Prerequisites: a Mac with **full Xcode 15 or later**, its iOS Simulator runtime, and an iOS 17+ Simulator or device. Command Line Tools alone do not include the SwiftData/SwiftUI compiler plugins needed for this app. The Swift package uses Swift 5 language mode and also targets macOS 14+ for tests.
+Prerequisites: a Mac with **full Xcode 27 or later for the included project** (the package uses iOS 17 APIs), its iOS Simulator runtime, and an iOS 17+ Simulator or device. Command Line Tools alone do not include the SwiftData/SwiftUI compiler plugins needed for this app. The Swift package uses Swift 5 language mode and also targets macOS 14+ for tests.
 
 The repository includes the Swift package and a ready-to-open iOS app project.
 
@@ -42,7 +42,7 @@ When only Command Line Tools are available, the dependency-free rule harness sti
 bash scripts/check-workout-math.sh
 ```
 
-**Validation (September 30, 2026):** Full Xcode package build and all 45 macOS XCTest tests passed, including SwiftData integration, exercise creation/editing, photo persistence, starting references, and punch-card carryover. Physical-device photo picking, haptics, animations, and visual/VoiceOver checks remain pending.
+**Validation (September 30, 2026):** Full Xcode package build and all 52 macOS XCTest tests passed, including SwiftData integration, exercise creation/editing, photo persistence, starting references, and punch-card carryover. The iOS app and embedded Live Activity extension also build successfully. Physical-device photo picking, haptics, Live Activity presentation, and visual/VoiceOver checks remain pending.
 
 If the app cannot open its data store, it now shows the error with **Try again** instead of crashing or silently replacing the store. The app uses local persistence only. Simulator and device installations have separate stores; there is no synchronization between phones.
 
@@ -146,3 +146,21 @@ Use **gear → Save full backup** to save a versioned JSON document in Files, in
 **Restore full backup** validates the JSON in a separate in-memory store before asking to replace local data. Replacement happens in a single SwiftData save with rollback on failure. Corrupt files, invalid relationships, unsupported versions, files over 100 MB, and more than 100,000 records are rejected. Save a current backup before replacing local data if you want to retain it. Rest alerts turn off after restore; turn them back on in Settings if desired. Backup files and device databases are excluded from Git.
 
 Validation includes repeat/undo behavior, template ownership and ordering, invalid set edits, favorites persistence, complete backup round trips (including deleted exercise snapshots, photos, visits, and claimed rewards), and rejection of invalid archives without changing the live store. Notification delivery, file-picker interactions, and VoiceOver should also be checked on a physical iPhone.
+
+
+## Train together, substitutions, and partial reps
+
+- **Today → Train together** starts or resumes one session per profile on the same phone. Choose a shared exercise, then log a set; the next person’s turn appears automatically. Each profile keeps its own load, history, rest deadline, and undo action. Both rest timers remain visible. Matching uses exercise names, never the other person’s weights. If a matching exercise is missing, choose that person’s alternative explicitly. Closing the screen leaves workouts active; Finish both saves completed sets and discards empty sessions.
+- **Swap exercise** on a logging card replaces uncompleted work with an exercise from that profile’s library, sorted with the same muscle group first. Already completed sets remain attached to the original exercise. Replacement targets come from the replacement’s history, with a starting reference or zero-load fallback for a first workout.
+- **Partial reps** has its own stepper when logging or editing a set. Last-time values and History show both full and partial reps. Only full reps affect volume, progression, estimated 1RM, and personal records. Previously supplied baseline partials are imported once: Qi’s hamstring curl +3, leg extension +1, and Hai’s Smith row +1. Later edits are preserved.
+- **Personal records** show a trophy banner and success haptic when a logged working set beats the exercise’s earlier weight, reps at that weight, or estimated 1RM. First-ever sets establish a baseline. Assisted exercises celebrate less assistance and full-rep improvements, without an estimated-1RM record.
+- **Reorder exercises** during a workout opens a drag-to-reorder list. Saving changes the order without replacing logs or sets.
+- **Progress → Weekly consistency** shows Monday–Sunday training days, completed workout count, and muscle groups for each profile. Multiple workouts on one date count as one training day. Imported baselines count; unfinished workouts and warm-up-only sessions do not. New logs snapshot muscle groups so later library edits do not rewrite weekly history.
+
+## Live Activity
+
+Enable **gear → Show Live Activity**, then log a set. The Lock Screen shows the profile, exercise, rest countdown, and next set. Dynamic Island is supported on compatible iPhones. Rest extension/skip updates the activity; finishing or discarding ends it. Each session has a separate activity, so both profiles can train together. Backups restore data but end existing activities. iPhone system settings may disable Live Activities, and iOS controls their delivery and lifetime.
+
+The included app embeds the `WorkoutLiveActivity` WidgetKit extension and sets `NSSupportsLiveActivities`. The tiny `WorkoutActivitySupport` package product shares ActivityKit attributes between the app and widget without linking the fitness database into the widget. Both the app and extension need the same development team for device signing. The existing app project under `Projects/iOS/FitnessTrackerIOS` has also been updated locally.
+
+New backups use JSON version 2 to include partial reps and muscle snapshots. Version 1 backups remain readable; missing partials default to zero, with the known baseline annotations migrated on startup. CSV exports have separate Full reps and Partial reps columns. No iCloud synchronization is implemented.

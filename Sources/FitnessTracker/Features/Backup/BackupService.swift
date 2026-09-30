@@ -20,7 +20,7 @@ enum BackupService {
     static func decode(_ data: Data) throws -> FitnessBackup {
         guard data.count <= 100_000_000 else { throw BackupError.invalid("file exceeds 100 MB.") }
         let archive = try JSONDecoder().decode(FitnessBackup.self, from: data)
-        guard archive.version == 1 else { throw BackupError.invalid("unsupported backup version.") }
+        guard (1...2).contains(archive.version) else { throw BackupError.invalid("unsupported backup version.") }
         // Build a separate store first, so malformed records never touch the live database.
         let staging = try ModelContainerFactory.make(inMemory: true)
         try populate(archive, context: staging.mainContext)
@@ -44,6 +44,7 @@ enum BackupService {
             try populate(archive, context: context)
             try context.save()
             RestAlerts.shared.disable()
+            RestLiveActivity.shared.endAll()
         } catch { context.rollback(); throw error }
     }
 
@@ -108,7 +109,7 @@ enum BackupService {
         for record in archive.sets {
             guard let log = record.logID.flatMap({ logs[$0] }) else { throw BackupError.invalid("missing exercise log for a set.") }
             let model = try SetEntry(log: log, order: record.order, weight: record.weight, reps: record.reps,
-                                     rpe: record.rpe, completedAt: record.completedAt, isWarmUp: record.isWarmUp)
+                                     rpe: record.rpe, completedAt: record.completedAt, isWarmUp: record.isWarmUp, partialReps: record.partialReps ?? 0)
             record.apply(to: model); context.insert(model)
         }
         for record in archive.cards {
@@ -158,12 +159,12 @@ enum BackupService {
             return "\"" + safe.replacingOccurrences(of: "\"", with: "\"\"") + "\""
         }
         let formatter = ISO8601DateFormatter()
-        var rows = [["Profile", "Workout date", "Exercise", "Set", "Weight", "Unit", "Reps", "RPE", "Completed", "Warm-up", "Load convention", "Notes"]]
+        var rows = [["Profile", "Workout date", "Exercise", "Set", "Weight", "Unit", "Full reps", "Partial reps", "RPE", "Completed", "Warm-up", "Load convention", "Notes"]]
         for session in try context.fetch(FetchDescriptor<WorkoutSession>(sortBy: [SortDescriptor(\.startedAt)])) {
             for log in session.orderedLogs {
                 for entry in log.orderedSets {
                     rows.append([session.profile?.name ?? "", formatter.string(from: session.startedAt), log.exerciseName,
-                        String(entry.order + 1), String(entry.weight), log.unit.rawValue, String(entry.reps), entry.rpe.map { String($0) } ?? "",
+                        String(entry.order + 1), String(entry.weight), log.unit.rawValue, String(entry.reps), String(entry.partialReps), entry.rpe.map { String($0) } ?? "",
                         entry.completedAt == nil ? "No" : "Yes", entry.isWarmUp ? "Yes" : "No", log.loadNotes ?? "", log.notes])
                 }
             }

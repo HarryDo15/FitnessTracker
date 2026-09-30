@@ -6,12 +6,30 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXTargetDependency section */
+		AF1700000000000000000010 = {isa = PBXTargetDependency; target = AF170000000000000000000D; targetProxy = AF170000000000000000000F; };
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		AF170000000000000000000F = {isa = PBXContainerItemProxy; containerPortal = 46662DF5306C9D2E003E36C0; proxyType = 1; remoteGlobalIDString = AF170000000000000000000D; remoteInfo = WorkoutLiveActivity; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AF170000000000000000000C = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (AF1700000000000000000007, ); name = "Embed App Extensions"; runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXBuildFile section */
 		46662E0D306C9D56003E36C0 /* FitnessTracker in Frameworks */ = {isa = PBXBuildFile; productRef = 46662E0C306C9D56003E36C0 /* FitnessTracker */; };
+		AF1700000000000000000004 = {isa = PBXBuildFile; fileRef = AF1700000000000000000001; };
+		AF1700000000000000000005 = {isa = PBXBuildFile; productRef = AF1700000000000000000006; };
+		AF1700000000000000000007 = {isa = PBXBuildFile; fileRef = AF1700000000000000000003; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		46662DFD306C9D2E003E36C0 /* FitnessTrackerIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitnessTrackerIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF1700000000000000000001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveActivity.swift; sourceTree = "<group>"; };
+		AF1700000000000000000002 = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AF1700000000000000000003 = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; path = WorkoutLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -29,6 +47,7 @@
 				46662E0D306C9D56003E36C0 /* FitnessTracker in Frameworks */,
 			);
 		};
+		AF170000000000000000000A = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (AF1700000000000000000005, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -36,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				46662DFF306C9D2E003E36C0 /* FitnessTrackerIOS */,
+				AF1700000000000000000008,
 				46662DFE306C9D2E003E36C0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -44,10 +64,12 @@
 			isa = PBXGroup;
 			children = (
 				46662DFD306C9D2E003E36C0 /* FitnessTrackerIOS.app */,
+				AF1700000000000000000003,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
+		AF1700000000000000000008 = {isa = PBXGroup; children = (AF1700000000000000000001, AF1700000000000000000002, ); path = WorkoutLiveActivity; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -58,9 +80,11 @@
 				46662DF9306C9D2E003E36C0 /* Sources */,
 				46662DFA306C9D2E003E36C0 /* Frameworks */,
 				46662DFB306C9D2E003E36C0 /* Resources */,
+				AF170000000000000000000C,
 			);
 			buildRules = (
 			);
+			dependencies = (AF1700000000000000000010, );
 			fileSystemSynchronizedGroups = (
 				46662DFF306C9D2E003E36C0 /* FitnessTrackerIOS */,
 			);
@@ -72,6 +96,7 @@
 			productReference = 46662DFD306C9D2E003E36C0 /* FitnessTrackerIOS.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AF170000000000000000000D = {isa = PBXNativeTarget; buildConfigurationList = AF170000000000000000000E; buildPhases = (AF1700000000000000000009, AF170000000000000000000A, AF170000000000000000000B, ); buildRules = (); dependencies = (); name = WorkoutLiveActivity; packageProductDependencies = (AF1700000000000000000006, ); productName = WorkoutLiveActivity; productReference = AF1700000000000000000003; productType = "com.apple.product-type.app-extension"; };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -105,6 +130,7 @@
 			projectRoot = "";
 			targets = (
 				46662DFC306C9D2E003E36C0 /* FitnessTrackerIOS */,
+				AF170000000000000000000D,
 			);
 		};
 /* End PBXProject section */
@@ -115,6 +141,7 @@
 			files = (
 			);
 		};
+		AF170000000000000000000B = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -123,6 +150,7 @@
 			files = (
 			);
 		};
+		AF1700000000000000000009 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (AF1700000000000000000004, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
@@ -256,6 +284,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -288,6 +317,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -309,6 +339,8 @@
 			};
 			name = Release;
 		};
+		AF1700000000000000000011 = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_TEAM = L54NX8VX62; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = WorkoutLiveActivity/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", ); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = haido.FitnessTrackerIOS.WorkoutLiveActivity; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		AF1700000000000000000012 = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEVELOPMENT_TEAM = L54NX8VX62; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = WorkoutLiveActivity/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks", ); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = haido.FitnessTrackerIOS.WorkoutLiveActivity; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = iphoneos; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2";}; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -328,6 +360,7 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		AF170000000000000000000E = {isa = XCConfigurationList; buildConfigurations = (AF1700000000000000000011, AF1700000000000000000012, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -342,6 +375,7 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = FitnessTracker;
 		};
+		AF1700000000000000000006 = {isa = XCSwiftPackageProductDependency; productName = WorkoutActivitySupport; };
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 46662DF5306C9D2E003E36C0 /* Project object */;

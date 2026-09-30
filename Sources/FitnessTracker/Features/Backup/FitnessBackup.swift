@@ -3,7 +3,7 @@ import SwiftData
 
 /// Versioned, portable JSON with embedded photos and stable relationship IDs.
 struct FitnessBackup: Codable {
-    var version = 1
+    var version = 2
     var exportedAt = Date.now
     var profiles: [ProfileRecord]
     var exercises: [ExerciseRecord]
@@ -43,6 +43,7 @@ struct ProfileRecord: Codable {
     var personalNameSeedVersion: Int
     var baselineWorkoutSeedVersion: Int
     var haiLibrarySeedVersion: Int
+    var partialRepSeedVersion: Int?
     var perSideLoadCorrectionVersion: Int
 
     @MainActor init(_ model: Profile) {
@@ -60,6 +61,7 @@ struct ProfileRecord: Codable {
         personalNameSeedVersion = model.personalNameSeedVersion
         baselineWorkoutSeedVersion = model.baselineWorkoutSeedVersion
         haiLibrarySeedVersion = model.haiLibrarySeedVersion
+        partialRepSeedVersion = model.partialRepSeedVersion
         perSideLoadCorrectionVersion = model.perSideLoadCorrectionVersion
     }
 
@@ -78,6 +80,7 @@ struct ProfileRecord: Codable {
         model.personalNameSeedVersion = personalNameSeedVersion
         model.baselineWorkoutSeedVersion = baselineWorkoutSeedVersion
         model.haiLibrarySeedVersion = haiLibrarySeedVersion
+        model.partialRepSeedVersion = partialRepSeedVersion ?? 0
         model.perSideLoadCorrectionVersion = perSideLoadCorrectionVersion
     }
 }
@@ -187,6 +190,7 @@ struct ExerciseLogRecord: Codable {
     var targetRepMaximum: Int
     var weightIncrement: Double?
     var loadNotes: String?
+    var muscleGroup: String?
     var exerciseName: String
     var unit: WeightUnit
     var isAssisted: Bool
@@ -201,6 +205,7 @@ struct ExerciseLogRecord: Codable {
         targetRepMaximum = model.targetRepMaximum
         weightIncrement = model.weightIncrement
         loadNotes = model.loadNotes
+        muscleGroup = model.muscleGroup
         exerciseName = model.exerciseName
         unit = model.unit
         isAssisted = model.isAssisted
@@ -216,6 +221,7 @@ struct ExerciseLogRecord: Codable {
         model.targetRepMaximum = targetRepMaximum
         model.weightIncrement = weightIncrement
         model.loadNotes = loadNotes
+        model.muscleGroup = muscleGroup
         model.exerciseName = exerciseName
         model.unit = unit
         model.isAssisted = isAssisted
@@ -226,6 +232,7 @@ struct SetEntryRecord: Codable {
     var id: UUID
     var order: Int
     var weight: Double
+    var partialReps: Int?
     var reps: Int
     var rpe: Double?
     var completedAt: Date?
@@ -236,6 +243,7 @@ struct SetEntryRecord: Codable {
         id = model.id
         order = model.order
         weight = model.weight
+        partialReps = model.partialReps
         reps = model.reps
         rpe = model.rpe
         completedAt = model.completedAt
@@ -247,6 +255,7 @@ struct SetEntryRecord: Codable {
         model.id = id
         model.order = order
         model.weight = weight
+        model.partialReps = partialReps ?? 0
         model.reps = reps
         model.rpe = rpe
         model.completedAt = completedAt

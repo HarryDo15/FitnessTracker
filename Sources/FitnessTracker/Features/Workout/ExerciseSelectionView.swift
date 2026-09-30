@@ -6,13 +6,15 @@ struct ExerciseSelectionView: View {
     @Query private var exercises: [Exercise]
     @State private var search = ""
     @State private var showingEditor = false
+    let allowExisting: Bool
     let profileID: UUID
     let session: WorkoutSession
     private var addedIDs: Set<UUID> { Set(session.exerciseLogs.compactMap { $0.exercise?.id }) }
     let add: (Exercise) -> Void
 
-    init(session: WorkoutSession, profileID: UUID, add: @escaping (Exercise) -> Void) {
+    init(session: WorkoutSession, profileID: UUID, allowExisting: Bool = false, add: @escaping (Exercise) -> Void) {
         self.profileID = profileID
+        self.allowExisting = allowExisting
         _exercises = Query(filter: #Predicate<Exercise> {
             $0.profile?.id == profileID && !$0.isArchived
         }, sort: \Exercise.name)
@@ -32,7 +34,7 @@ struct ExerciseSelectionView: View {
                     ContentUnavailableView.search(text: search)
                 }
                 ForEach(filtered) { exercise in
-                    Button { add(exercise) } label: {
+                    Button { add(exercise); if allowExisting { dismiss() } } label: {
                         HStack(spacing: 16) {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text((exercise.isFavorite ? "★ " : "") + exercise.name).font(.headline).foregroundStyle(.primary)
@@ -42,8 +44,8 @@ struct ExerciseSelectionView: View {
                             Image(systemName: addedIDs.contains(exercise.id) ? "checkmark.circle.fill" : "plus.circle.fill")
                                 .font(.title2)
                         }.frame(minHeight: 56).contentShape(Rectangle())
-                    }.disabled(addedIDs.contains(exercise.id))
-                    .accessibilityLabel("\(exercise.name), \(addedIDs.contains(exercise.id) ? "added" : "add exercise")")
+                    }.disabled(!allowExisting && addedIDs.contains(exercise.id))
+                    .accessibilityLabel("\(exercise.name), \(allowExisting ? "choose exercise" : (addedIDs.contains(exercise.id) ? "added" : "add exercise"))")
                 }
             }
             .searchable(text: $search, prompt: "Find an exercise")

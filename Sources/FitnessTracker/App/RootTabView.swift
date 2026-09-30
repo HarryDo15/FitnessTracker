@@ -55,6 +55,11 @@ public struct RootTabView: View {
             }
         }
         .sheet(isPresented: $showingSettings) { NavigationStack { AppSettingsView() } }
+        .task {
+            if let sessions = try? context.fetch(FetchDescriptor<WorkoutSession>()) {
+                RestLiveActivity.shared.reconcile(activeSessionIDs: Set(sessions.filter { $0.status == .active }.map(\.id)))
+            }
+        }
         .onChange(of: profiles.map(\.id), initial: true) { _, _ in selection.restore(from: profiles) }
         .alert("Couldn’t create profiles", isPresented: Binding(get: { errorMessage != nil }, set: { if !$0 { errorMessage = nil } })) {
             Button("OK") { errorMessage = nil }

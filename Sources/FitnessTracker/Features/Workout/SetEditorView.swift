@@ -8,6 +8,7 @@ struct SetEditorView: View {
     let entry: SetEntry
     @State private var weight: Double
     @State private var reps: Int
+    @State private var partialReps: Int
     @State private var errorMessage: String?
     @State private var confirmDelete = false
     let onChange: () -> Void
@@ -17,6 +18,7 @@ struct SetEditorView: View {
         self.onChange = onChange
         _weight = State(initialValue: entry.weight)
         _reps = State(initialValue: entry.reps)
+        _partialReps = State(initialValue: entry.partialReps)
     }
 
     var body: some View {
@@ -28,11 +30,13 @@ struct SetEditorView: View {
                 }, onDecrement: { weight = SetInputRules.adjustedWeight(weight, by: -(entry.log?.weightIncrement ?? 2.5)) }).frame(minHeight: 48)
                 TextField("Reps", value: $reps, format: .number).accessibilityLabel("Repetitions")
                 Stepper("Reps: \(reps)", value: $reps, in: 1...999).frame(minHeight: 48)
+                Stepper("Partial reps: \(partialReps)", value: $partialReps, in: 0...999).frame(minHeight: 48)
+                Text("Only full reps count toward progression and volume.").font(.caption)
                 if let notes = entry.log?.loadNotes, !notes.isEmpty { Text(notes).font(.caption) }
             }
             Button("Save changes") {
                 do {
-                    try SetEditingService.update(entry, weight: weight, reps: reps, context: context)
+                    try SetEditingService.update(entry, weight: weight, reps: reps, partialReps: partialReps, context: context)
                     onChange(); dismiss()
                 } catch { errorMessage = error.localizedDescription }
             }.frame(minHeight: 48).disabled(!SetInputRules.isValid(weight: weight, reps: reps))

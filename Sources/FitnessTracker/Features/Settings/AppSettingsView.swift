@@ -17,6 +17,7 @@ struct AppSettingsView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @AppStorage("restAlertsEnabled") private var alertsEnabled = false
+    @AppStorage("liveActivitiesEnabled") private var liveActivitiesEnabled = false
     @AppStorage("restoreGeneration") private var restoreGeneration = 0
     @State private var requestingPermission = false
     @State private var exporting = false
@@ -55,6 +56,23 @@ struct AppSettingsView: View {
                 }
                 #endif
             }
+            #if os(iOS)
+            Section("Lock Screen") {
+                Toggle("Show Live Activity", isOn: $liveActivitiesEnabled)
+                    .onChange(of: liveActivitiesEnabled) { _, enabled in
+                        if !enabled { RestLiveActivity.shared.endAll(); return }
+                        do {
+                            for profile in try context.fetch(FetchDescriptor<Profile>()) {
+                                let model = WorkoutViewModel(profile: profile, context: context)
+                                model.restore(); model.syncRestAlert()
+                            }
+                        } catch { message = error.localizedDescription }
+                    }
+                Text("Shows the rest countdown and next set on the Lock Screen and Dynamic Island. Log a set to start it. Live Activities must also be allowed in iPhone Settings.")
+                    .font(.caption).foregroundStyle(.secondary)
+                if let error = RestLiveActivity.shared.errorMessage { Text(error).font(.caption).foregroundStyle(.secondary) }
+            }
+            #endif
             Section("Backup and export — both profiles") {
                 Button { export(csv: false) } label: { Label("Save full backup", systemImage: "externaldrive").frame(minHeight: 48) }
                 Button { export(csv: true) } label: { Label("Export sets as CSV", systemImage: "tablecells").frame(minHeight: 48) }

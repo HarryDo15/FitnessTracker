@@ -15,6 +15,7 @@ struct ProgressDashboardView: View {
             return count >= ProgressionEngine.stalledSessionThreshold ? (exercise, count) : nil
         }.sorted { $0.1 == $1.1 ? $0.0.name < $1.0.name : $0.1 > $1.1 }
         List {
+            NavigationLink { WeeklyConsistencyView() } label: { Label("Weekly consistency", systemImage: "calendar").frame(minHeight: 48) }
             Section {
                 Text("\(stalled.count) stalled exercises").font(.title2.bold())
                 Text("Three or more consecutive completed sessions without improvement over the preceding session. Needs at least four sessions of history.")

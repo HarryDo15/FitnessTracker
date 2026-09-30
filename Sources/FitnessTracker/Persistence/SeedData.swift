@@ -51,6 +51,7 @@ public enum SeedData {
             try QiStartingValues.install(in: context, profiles: profiles)
             try HaiExerciseLibrary.install(in: context, profiles: profiles)
             try BaselineWorkoutSeed.install(in: context, profiles: profiles)
+            PartialRepSeed.install(profiles: profiles)
             try GymVisitService(context: context).importStartingPunches(profiles: profiles, target: 7)
         }
         try context.save()

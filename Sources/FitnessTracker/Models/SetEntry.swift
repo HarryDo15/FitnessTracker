@@ -7,6 +7,7 @@ public final class SetEntry {
     public var order: Int
     public var weight: Double
     public var reps: Int
+    public var partialReps: Int = 0
     public var rpe: Double?
     /// Nil means planned/incomplete; a date records when the set was completed.
     public var completedAt: Date?
@@ -14,14 +15,15 @@ public final class SetEntry {
     public var log: ExerciseLog?
 
     public init(log: ExerciseLog, order: Int, weight: Double, reps: Int, rpe: Double? = nil,
-                completedAt: Date? = nil, isWarmUp: Bool = false) throws {
-        guard SetInputRules.isValid(weight: weight, reps: reps, completed: completedAt != nil),
+                completedAt: Date? = nil, isWarmUp: Bool = false, partialReps: Int = 0) throws {
+        guard (0...999).contains(partialReps), SetInputRules.isValid(weight: weight, reps: reps, completed: completedAt != nil),
               rpe.map({ $0.isFinite && (1...10).contains($0) }) ?? true else { throw ModelValidationError.invalidSet }
         self.id = UUID()
         self.log = log
         self.order = order
         self.weight = weight
         self.reps = reps
+        self.partialReps = partialReps
         self.rpe = rpe
         self.completedAt = completedAt
         self.isWarmUp = isWarmUp

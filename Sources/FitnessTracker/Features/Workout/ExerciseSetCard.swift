@@ -4,6 +4,9 @@ import SwiftUI
 struct ExerciseSetCard: View {
     let log: ExerciseLog
     let model: WorkoutViewModel
+    var onLogged: () -> Void = {}
+    var onSubstituted: (ExerciseLog) -> Void = { _ in }
+    @State private var showingSubstitution = false
     @State private var editingSet: SetEntry?
     @FocusState private var isEditing: Bool
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -24,6 +27,9 @@ struct ExerciseSetCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(log.exerciseName).font(.title2.bold()).accessibilityAddTraits(.isHeader)
+            Button { showingSubstitution = true } label: {
+                Label("Swap exercise", systemImage: "arrow.triangle.swap").frame(minHeight: 44)
+            }.buttonStyle(.bordered)
             if let photo = log.exercise?.photoData {
                 ExercisePhotoView(data: photo, exerciseName: log.exerciseName, maximumHeight: 180)
             }
@@ -48,9 +54,9 @@ struct ExerciseSetCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("LAST TIME").font(.caption.bold()).foregroundStyle(.secondary)
                     ForEach(Array(previous.enumerated()), id: \.element.id) { index, set in
-                        Text("\(index + 1).  \(set.weight, specifier: "%.2f") \(set.unit.rawValue) × \(set.reps)")
+                        Text("\(index + 1).  \(set.weight.formatted(.number.precision(.fractionLength(2)))) \(set.unit.rawValue) × \(set.reps)" + (set.partialReps > 0 ? " + \(set.partialReps) partial" : ""))
                             .font(.subheadline).monospacedDigit()
-                            .accessibilityLabel("Last time, set \(index + 1): \(SpokenWorkoutValue.set(weight: set.weight, unit: set.unit, reps: set.reps))")
+                            .accessibilityLabel("Last time, set \(index + 1): \(SpokenWorkoutValue.set(weight: set.weight, unit: set.unit, reps: set.reps)), \(set.partialReps) partial reps")
                     }
                 }
             }
@@ -61,9 +67,9 @@ struct ExerciseSetCard: View {
             ForEach(Array(completed.enumerated()), id: \.element.id) { index, set in
                 Button { editingSet = set } label: {
                 AccessibleMetricRow(label: "Set \(index + 1) completed",
-                    value: "\(set.weight.formatted()) \(log.unit.rawValue) × \(set.reps)")
+                    value: "\(set.weight.formatted()) \(log.unit.rawValue) × \(set.reps)" + (set.partialReps > 0 ? " + \(set.partialReps) partial" : ""))
                     .accessibilityLabel("Set \(index + 1) completed")
-                    .accessibilityValue(SpokenWorkoutValue.set(weight: set.weight, unit: log.unit, reps: set.reps))
+                    .accessibilityValue(SpokenWorkoutValue.set(weight: set.weight, unit: log.unit, reps: set.reps) + ", \(set.partialReps) partial reps")
                 }.buttonStyle(.plain).frame(minHeight: 44).accessibilityHint("Double tap to edit this set")
             }
             Divider()
@@ -84,10 +90,16 @@ struct ExerciseSetCard: View {
             VStack(spacing: 12) {
                 weightControl
                 repsControl
+                Stepper("Partial reps: \(draft.partialReps)", value: Binding(get: { draft.partialReps }, set: {
+                    var updated = draft; updated.partialReps = $0; model.updateDraft(updated, for: log)
+                }), in: 0...999).frame(minHeight: 48)
+                Text("Only full reps count toward targets and volume.").font(.caption).foregroundStyle(.secondary)
             }
             Button {
                 isEditing = false
+                let before = completed.count
                 model.logSet(for: log)
+                if completed.count > before { onLogged() }
             } label: {
                 Label("Log Set \(completed.count + 1)", systemImage: "checkmark")
                     .font(.headline).frame(maxWidth: .infinity, minHeight: 52)
@@ -101,6 +113,9 @@ struct ExerciseSetCard: View {
             }
         }
         .padding().background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 20))
+        .sheet(isPresented: $showingSubstitution) {
+            NavigationStack { ExerciseSubstitutionView(log: log, model: model, substituted: onSubstituted) }
+        }
         .sheet(item: $editingSet) { entry in
             NavigationStack { SetEditorView(entry: entry, onChange: model.skipRest) }
         }

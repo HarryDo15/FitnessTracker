@@ -27,6 +27,7 @@ struct HistoryView: View {
                                 Button { editingSet = set } label: {
                                 VStack(alignment: .leading) {
                                     Text("\(set.weight, specifier: "%.1f") \(log.unit.rawValue) × \(set.reps)")
+                                    if set.partialReps > 0 { Text("+ \(set.partialReps) partial reps").font(.subheadline) }
                                     if let rpe = set.rpe { Text("RPE \(rpe, specifier: "%.1f")").font(.caption) }
                                     if let date = set.completedAt, !session.isDateOnlyImport {
                                         Text(date, style: .time).font(.caption).foregroundStyle(.secondary)

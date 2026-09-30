@@ -3,6 +3,30 @@ import SwiftData
 @testable import FitnessTracker
 
 final class BackupTests: XCTestCase {
+    @MainActor func testVersionOneBackupsStillLoadAndInvalidPartialsAreRejected() throws {
+        let container = try ModelContainerFactory.make(inMemory: true)
+        let context = container.mainContext
+        try SeedData.install(in: context)
+        let data = try BackupService.export(context: context)
+        var legacy = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        legacy["version"] = 1
+        for (collection, key) in [("profiles", "partialRepSeedVersion"), ("sets", "partialReps"), ("logs", "muscleGroup")] {
+            let records = try XCTUnwrap(legacy[collection] as? [[String: Any]])
+            legacy[collection] = records.map { record in var copy = record; copy.removeValue(forKey: key); return copy }
+        }
+        let oldData = try JSONSerialization.data(withJSONObject: legacy)
+        XCTAssertNoThrow(try BackupService.decode(oldData))
+        try BackupService.restore(oldData, context: context)
+        XCTAssertTrue(try context.fetch(FetchDescriptor<SetEntry>()).allSatisfy { $0.partialReps == 0 })
+        try SeedData.install(in: context)
+        let qi = try XCTUnwrap(context.fetch(FetchDescriptor<Profile>()).first { $0.punchCardEnabled })
+        XCTAssertEqual(qi.exercises.first { $0.name == "Hamstring curl" }?.logs.first?.sets.first?.partialReps, 3)
+        var invalid = try JSONDecoder().decode(FitnessBackup.self, from: data)
+        invalid.sets[0].partialReps = -1
+        XCTAssertThrowsError(try BackupService.restore(JSONEncoder().encode(invalid), context: context))
+        XCTAssertEqual(try context.fetchCount(FetchDescriptor<WorkoutSession>()), 2)
+    }
+
     @MainActor func testFullBackupRoundTripIncludesImagesTemplatesRewardsAndSnapshots() throws {
         let container = try ModelContainerFactory.make(inMemory: true)
         let context = container.mainContext

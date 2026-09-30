@@ -18,6 +18,7 @@ public final class Profile {
     public var baselineWorkoutSeedVersion: Int = 0
     public var haiLibrarySeedVersion: Int = 0
     public var perSideLoadCorrectionVersion: Int = 0
+    public var partialRepSeedVersion: Int = 0
 
     @Relationship(deleteRule: .cascade, inverse: \WorkoutTemplate.profile)
     public var templates: [WorkoutTemplate] = []

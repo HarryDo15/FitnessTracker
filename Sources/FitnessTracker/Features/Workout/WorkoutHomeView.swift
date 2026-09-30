@@ -25,6 +25,8 @@ struct WorkoutFlowView: View {
     @State private var showingExercises = false
     @State private var showingTemplates = false
     @State private var savingTemplate = false
+    @State private var reordering = false
+    @State private var trainingTogether = false
 
     init(profile: Profile, context: ModelContext) {
         _model = State(initialValue: WorkoutViewModel(profile: profile, context: context))
@@ -32,7 +34,9 @@ struct WorkoutFlowView: View {
 
     var body: some View {
         Group {
-            if let completed = model.finishedSession {
+            if trainingTogether {
+                Text("Train Together is open").foregroundStyle(.secondary)
+            } else if let completed = model.finishedSession {
                 WorkoutSummaryView(session: completed, done: model.dismissSummary)
             } else if let session = model.session {
                 workout(session)
@@ -60,6 +64,15 @@ struct WorkoutFlowView: View {
         }
         .navigationTitle(model.finishedSession != nil ? "Workout complete" : "Today")
         .task { model.restore() }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { trainingTogether = true } label: { Label("Train together", systemImage: "person.2.fill") }
+            }
+        }
+        .sheet(isPresented: Binding(get: { trainingTogether }, set: { value in
+            if !value { model.restore() }; trainingTogether = value
+        })) { NavigationStack { TogetherWorkoutHost() } }
+        .sheet(isPresented: $reordering) { NavigationStack { ExerciseOrderView(model: model) } }
         .sheet(isPresented: $showingTemplates) {
             NavigationStack { TemplateListView(profile: model.profile, start: { model.start(template: $0) }) }
         }
@@ -96,6 +109,9 @@ struct WorkoutFlowView: View {
                     ContentUnavailableView("Add your first exercise", systemImage: "dumbbell",
                         description: Text("Your previous weights and reps will be ready to go."))
                 }
+                if let message = model.recordMessage { RecordCelebrationView(message: message) { model.recordMessage = nil } }
+                Button { reordering = true } label: { Label("Reorder exercises", systemImage: "arrow.up.arrow.down").frame(minHeight: 44) }
+                    .disabled(session.exerciseLogs.count < 2)
                 ForEach(session.orderedLogs) { log in
                     ExerciseSetCard(log: log, model: model)
                 }

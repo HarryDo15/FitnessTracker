@@ -3,17 +3,18 @@ import SwiftData
 
 @MainActor
 enum SetEditingService {
-    static func update(_ entry: SetEntry, weight: Double, reps: Int, context: ModelContext) throws {
-        guard SetInputRules.isValid(weight: weight, reps: reps, completed: entry.completedAt != nil) else {
+    static func update(_ entry: SetEntry, weight: Double, reps: Int, partialReps: Int? = nil, context: ModelContext) throws {
+        guard (0...999).contains(partialReps ?? entry.partialReps), SetInputRules.isValid(weight: weight, reps: reps, completed: entry.completedAt != nil) else {
             throw ModelValidationError.invalidSet
         }
         entry.weight = weight
         entry.reps = reps
+        if let partialReps { entry.partialReps = partialReps }
         let session = entry.log?.session
         if session?.status == .active { session?.restEndsAt = nil }
         do {
             try context.save()
-            if let session, session.status == .active { RestAlerts.shared.cancel(sessionID: session.id) }
+            if let session, session.status == .active { RestAlerts.shared.cancel(sessionID: session.id); RestLiveActivity.shared.end(sessionID: session.id) }
         } catch { context.rollback(); throw error }
     }
 
@@ -23,7 +24,7 @@ enum SetEditingService {
         context.delete(entry)
         do {
             try context.save()
-            if let session, session.status == .active { RestAlerts.shared.cancel(sessionID: session.id) }
+            if let session, session.status == .active { RestAlerts.shared.cancel(sessionID: session.id); RestLiveActivity.shared.end(sessionID: session.id) }
         } catch { context.rollback(); throw error }
     }
 }

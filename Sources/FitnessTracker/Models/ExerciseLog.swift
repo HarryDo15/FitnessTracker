@@ -10,6 +10,7 @@ public final class ExerciseLog {
     public var targetRepMaximum: Int
     public var weightIncrement: Double?
     public var loadNotes: String?
+    public var muscleGroup: String?
     public var exerciseName: String
     public var unit: WeightUnit
     public var isAssisted: Bool
@@ -41,6 +42,7 @@ public final class ExerciseLog {
         self.weightIncrement = exercise.weightIncrement
         self.loadNotes = exercise.loadNotes
         self.notes = notes
+        self.muscleGroup = exercise.muscleGroup
         self.exerciseName = exercise.name
         self.unit = exercise.unit
         self.isAssisted = exercise.isAssisted
